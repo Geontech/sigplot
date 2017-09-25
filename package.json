@@ -4,7 +4,11 @@
   "version": "2.0.0-rc2",
   "homepage": "http://sigplot.lgsinnovations.com",
   "main":    "./js/sigplot.js",
+<<<<<<< HEAD
   "typings": "./typings/sigplot.d.ts",
+=======
+  "typings": "./js/sigplot.d.ts",
+>>>>>>> Initial commit of top-level typings for interfaces in SigPlot 2.0.
   "files": [
     "js",
 <<<<<<< HEAD
