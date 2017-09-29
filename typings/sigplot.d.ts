@@ -1,4 +1,14 @@
-export as namespace sigplot;
+export * from './bluefile';
+export * from './m';
+export * from './matfile';
+export * from './mx';
+export * from './sigplot.layer';
+export * from './sigplot.layer1d';
+export * from './sigplot.layer2d';
+
+import { m } from './m';
+import { bluefile } from './bluefile';
+import { layer } from './sigplot.layer';
 
 /**
  * Purpose: Construction Options interface
@@ -268,77 +278,6 @@ export interface ICoordinatePair {
 }
 
 /**
- * Purpose: Headermod Options Interface
- * Note:    This is a guess from sigplot.js, sigplot.layer1d.js, etc. making it
- *          unclear what all the available options exist in this interface.
- */
-export interface IHeadermodOptions {
-    type?      : string;
-    timestamp? : string;
-    subsize?   : number;
-    lps?       : any;
-    xstart?    : number;
-    xdelta?    : number;
-}
-
-/**
- * Purpose: Layer interface
- * Note:    This is inferred from SIGPLOTLAYER, sigplot.js
- */
-export interface ILayer {
-    xbuf: ArrayBuffer; // raw (ArrayBuffer) of ABSC data
-    ybuf: ArrayBuffer; // raw (ArrayBuffer) of ORD data
-
-    offset: number;
-    xstart: number;
-    xdelta: number;
-    imin:   number;
-    xmin:   number;
-    xmax:   number;
-    name:   string;
-    cx:     boolean;
-    hcb:    number; // index in Gx.HCB
-    // xbufn = xbuf.byteLength
-    // ybufn = ybuf.byteLength
-    size:   number;
-
-    display: boolean;
-    color:   number;
-    line:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
-    thick:   number; // negative for dashed
-    symbol:  number;
-    radius:  number;
-
-    skip:    number; // number of elements between ord values
-    xsub:    number;
-    ysub:    number;
-    xdata:   boolean; // true if X data is data from file
-
-    options: any;
-}
-
-/**
- * Purpose: Layer Options interface (i.e., settings structure)
- * Note:    This is a guess based on:
- *          init, sigplot.layer1d.js
- *          change_settings, sigplot.layer2d.js
- */ 
-export interface ILayerOptions {
-    name?      : string;
-    cmode?     : number;
-    expand?    : boolean;
-    zmin?      : number;
-    zmax?      : number;
-    autoz?     : number;
-    drawmode?  : string;
-    framesize? : number;
-    opacity?   : number;
-    tl?        : number;
-    layerType? : string; // "1D" or "2D"
-    etc?       : object; // Unclear what this can be, "varies"
-}
-
-/**
  * Purpose: "Overrides" for overlay
  */
 export interface IOverlayOverrides {
@@ -369,20 +308,31 @@ export interface IPlotColors {
     bg? : string,
 }
 
+export interface IGridStyle {
+    mode   : string, // null -> solid, "dashed" -> dashed (requires on, off)
+    on?    : number,
+    off?   : number,
+    color? : string | Array<string>, // HTML5 canvas fillStyle (so "red" or an array, etc.)
+}
+
 /**
  * Purpose: Settings Options interface
  * Note:    This settings structure is for updating an already-instantiated
  *          plot.
  */
 export interface ISettingsOptions {
+    xyKeys?                      : string;
     grid?                        : boolean;
+    gridBackground?              : string | Array<string>;  // HTML5 canvas fillStyle (so "red" or an array, etc.)
+    gridStyle?                   : IGridStyle;
+    autol?                       : boolean; // TODO: Define
     index?                       : boolean;
     all?                         : boolean;
     show_x_axis?                 : boolean;
     show_y_axis?                 : boolean;
     show_readout?                : boolean;
     specs?                       : boolean;
-    xcnt?                        : string;
+    xcnt?                        : string;  // leftmouse, continuous, disable, enable
     legend?                      : boolean;
     pan?                         : boolean;
     cross?                       : boolean;
@@ -391,8 +341,37 @@ export interface ISettingsOptions {
     rightclick_rubberbox_action? : string;
     rightclick_rubberbox_mode?   : string;
     wheelscroll_mode_natural?    : string;
+    wheelZoom?                   : boolean;
+    wheelZoomPercent?            : number;
     cmode?                       : string;
     phunits?                     : string;
+    colors?                      : IPlotColors;
+    cmap?                        : number | string | m.IColorMap; // See m.Mc.colormap's array (index, string name, or your own).
+    rasterSmoothing?             : boolean; // null toggle
+    invert?                      : boolean; // null toggle
+    nomenu?                      : boolean; // null toggle
+
+    note?                        : object; // TODO: Define
+    lg_colorbar?                 : object; // TODO: Define
+    enabled_streaming_pcut?      : boolean;
+    p_cuts?                      : boolean;
+
+    xinv?                        : boolean;
+    xmax?                        : number;
+    xmin?                        : number;
+    autox?                       : number;  // enumeration
+    xcut_now?                    : boolean;
+
+    yinv?                        : boolean;
+    ymax?                        : number;
+    ymin?                        : number;
+    autoy?                       : number;  // enumeration
+    ycut_now?                    : boolean;
+
+    zinv?                        : boolean;
+    zmax?                        : number;
+    zmin?                        : number;
+    autoz?                       : number;  // enumeration
 }
 
 /**
@@ -415,12 +394,12 @@ export declare class Plot {
 
     addListener(
         what     : string,
-        callback : (() => void)
+        callback : ((...args: any[]) => void)
         );
 
     removeListener(
         what     : string,
-        callback : (() => void)
+        callback : ((...args: any[]) => void)
         );
 
     change_settings(
@@ -445,7 +424,7 @@ export declare class Plot {
     reload(
         n       : number,
         data    : number[],
-        hdrmod? : IHeadermodOptions
+        hdrmod? : bluefile.IBlueHeaderOptions
     ) : void;
 
     /**
@@ -457,7 +436,7 @@ export declare class Plot {
     push(
         n       : number,
         data    : number[],
-        hdrmod? : IHeadermodOptions,
+        hdrmod? : bluefile.IBlueHeaderOptions,
         sync?   : boolean,
         rsync?  : boolean,
         ) : void;
@@ -465,37 +444,37 @@ export declare class Plot {
     overlay_array(
         data          : number[],
         overrides?    : IOverlayOverrides,
-        layerOptions? : ILayerOptions
+        layerOptions? : object
         ) : number;
 
     // See the push() method for sending data
     overlay_pipe(
         overrides?    : IOverlayOverrides,
-        layerOptions? : ILayerOptions
+        layerOptions? : object
         ) : number;
 
     // For websockets
     overlay_websocket(
         wsurl         : string,
         overrides?    : IOverlayOverrides,
-        layerOptions? : ILayerOptions
+        layerOptions? : object
         ) : number;
 
     // For reading bluefile or matfile from a URL
     overlay_href(
         wsurl         : string,
         overrides?    : IOverlayOverrides,
-        layerOptions? : ILayerOptions
+        layerOptions? : object
         ) : void;
 
     overlay_bluefile(
         hcb: any,
-        layerOptions?: ILayerOptions
+        layerOptions?: object
         ) : number;
 
     overlay_mfile(
         matfile: any,
-        layerOptions?: ILayerOptions
+        layerOptions?: object
         ): number;
 
     /**
@@ -518,7 +497,7 @@ export declare class Plot {
      */
     get_layer(
         n : number
-        ) : ILayer;
+        ) : layer.ILayer;
 
 
     load_files(
