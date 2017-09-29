@@ -5,10 +5,14 @@
   "homepage": "http://sigplot.lgsinnovations.com",
   "main":    "./js/sigplot.js",
 <<<<<<< HEAD
+<<<<<<< HEAD
   "typings": "./typings/sigplot.d.ts",
 =======
   "typings": "./js/sigplot.d.ts",
 >>>>>>> Initial commit of top-level typings for interfaces in SigPlot 2.0.
+=======
+  "typings": "./typings/sigplot.d.ts",
+>>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
   "files": [
     "js",
 <<<<<<< HEAD

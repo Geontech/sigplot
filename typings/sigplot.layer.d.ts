@@ -4,7 +4,11 @@ import { bluefile } from './bluefile';
 import { Plot } from './sigplot';
 
 export declare module layer {
+<<<<<<< HEAD
     export interface ILayerSettings {
+=======
+    export interface ILayer {
+>>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
         plot?: Plot;
 
         offset?: number;
@@ -21,11 +25,19 @@ export declare module layer {
         size?: number;
 
         display?: boolean;
+<<<<<<< HEAD
         color?:   number | string;
         line?:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
         thick?:   number; // negative for dashed
         symbol?:  number;
         radius?:  number;
+=======
+        color?: number;
+        line?: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
+        thick?: number; // negative for dashed
+        symbol?: number;
+        radius?: number;
+>>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
 
         skip?: number; // number of elements between ord values
         xsub?: number;
@@ -36,9 +48,13 @@ export declare module layer {
         preferred_origin?: number;
 
         options?: object;
+<<<<<<< HEAD
     }
 
     export interface ILayer extends ILayerSettings {
+=======
+
+>>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
         // Common methods
         init: (hcb: bluefile.BlueHeader, ...args: any[]) => void;
         _onpipewrite: () => void;

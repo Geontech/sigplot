@@ -21,7 +21,10 @@ export declare module bluefile {
 
         data_start?: number;
         data_size?:  number;
+<<<<<<< HEAD
         pipesize?:   number;
+=======
+>>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
         ext_header?: object;
 
         spa?:   number;
