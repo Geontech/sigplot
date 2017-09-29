@@ -4,7 +4,7 @@
   "version": "2.0.0rc",
   "homepage": "http://sigplot.lgsinnovations.com",
   "main":    "./js/sigplot.js",
-  "typings": "./js/sigplot.d.ts",
+  "typings": "./typings/sigplot.d.ts",
   "files": [
     "js",
     "dist"
