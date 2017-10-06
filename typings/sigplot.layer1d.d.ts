@@ -36,11 +36,11 @@ export declare class Layer1D implements layer.ILayer {
     size: number;
 
     display: boolean;
-    color: number;
-    line: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
-    thick: number; // negative for dashed
-    symbol: number;
-    radius: number;
+    color:   number | string;
+    line:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
+    thick:   number; // negative for dashed
+    symbol:  number;
+    radius:  number;
 
     skip: number; // number of elements between ord values
     xsub: number;
