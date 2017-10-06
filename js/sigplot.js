@@ -30,6 +30,8 @@
 
 (function() {
 
+    var version = "version-PLACEHOLDER";
+
     var Spinner = require("spin");
     var common = require("./common");
     var bluefile = require("./bluefile");
@@ -51,6 +53,7 @@
     sigplot.mx = mx;
     sigplot.Layer1D = Layer1D;
     sigplot.Layer2D = Layer2D;
+    sigplot.version = version;
 
     /**
      * Text of the keypress help dialog.
@@ -5665,7 +5668,7 @@
 
         var REFRESH_ITEM = {
             text: "Refresh" // no handler, just let the finalizer deal with
-            // it
+                // it
         };
 
         var KEYPRESSINFO_ITEM = {

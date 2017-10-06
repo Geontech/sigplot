@@ -157,7 +157,7 @@ module.exports = function (grunt) {
         },
         clean: {
             build: ["dist/**/*", "!dist/*.zip"],
-            doc: ["doc/**/*"]
+            doc: ["doc/**/*", "!doc/*.png", "!doc/Sigplot_Setup.md"]
         },
         compress: {
             main: {
@@ -170,6 +170,16 @@ module.exports = function (grunt) {
                     {src: ['doc/**/*'], dest: 'sigplot-<%= pkg.version %>'}
                 ]
             }
+        },
+        replace: {
+            version: {
+                src: ["dist/*.js"],
+                overwrite: true,
+                replacements: [{
+                    from: /version-PLACEHOLDER/g,
+                    to: "<%= pkg.version %>",
+                }],
+            },
         },
         web_server: {
             options: {
@@ -292,8 +302,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-express-server');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-text-replace');
 
-    grunt.registerTask('build', ['jsbeautifier:check', 'jshint', 'browserify']);
+    grunt.registerTask('build', ['jsbeautifier:check', 'jshint', 'browserify', 'replace']);
 
     // Check everything is good
     grunt.registerTask('test', ['build', 'qunit']);
