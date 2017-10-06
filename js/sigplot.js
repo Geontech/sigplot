@@ -40,6 +40,7 @@
     var mx = require("./mx");
     var Layer1D = require("./sigplot.layer1d");
     var Layer2D = require("./sigplot.layer2d");
+    var plugins = require("./plugins");
 
     function sigplot(element, options) {
         if (!(this instanceof sigplot)) {
@@ -54,6 +55,7 @@
     sigplot.Layer1D = Layer1D;
     sigplot.Layer2D = Layer2D;
     sigplot.version = version;
+    sigplot.plugins = plugins;
 
     /**
      * Text of the keypress help dialog.
