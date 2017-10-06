@@ -30,6 +30,7 @@ export declare module plugins {
     export interface IAnnotationOptions extends _IAnnotationOptions {}
     export interface IAnnotation        extends _IAnnotation {}
     export type      Annotations        =       _Annotations;
+    export type      AnnotationValue    =       _AnnotationValue;
 
     // Boxes
     export class     BoxesPlugin   extends _BoxesPlugin {}
