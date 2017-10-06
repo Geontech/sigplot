@@ -41,11 +41,15 @@ export declare class Layer1D implements layer.ILayer {
 
     display: boolean;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
     color:   number | string;
     line:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
     thick:   number; // negative for dashed
     symbol:  number;
     radius:  number;
+<<<<<<< HEAD
 =======
     color: number;
     line: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
@@ -53,6 +57,8 @@ export declare class Layer1D implements layer.ILayer {
     symbol: number;
     radius: number;
 >>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
+=======
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
 
     skip: number; // number of elements between ord values
     xsub: number;

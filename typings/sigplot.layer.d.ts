@@ -5,10 +5,14 @@ import { Plot } from './sigplot';
 
 export declare module layer {
 <<<<<<< HEAD
+<<<<<<< HEAD
     export interface ILayerSettings {
 =======
     export interface ILayer {
 >>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
+=======
+    export interface ILayerSettings {
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
         plot?: Plot;
 
         offset?: number;
@@ -26,11 +30,15 @@ export declare module layer {
 
         display?: boolean;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
         color?:   number | string;
         line?:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
         thick?:   number; // negative for dashed
         symbol?:  number;
         radius?:  number;
+<<<<<<< HEAD
 =======
         color?: number;
         line?: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
@@ -38,6 +46,8 @@ export declare module layer {
         symbol?: number;
         radius?: number;
 >>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
+=======
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
 
         skip?: number; // number of elements between ord values
         xsub?: number;
@@ -49,12 +59,18 @@ export declare module layer {
 
         options?: object;
 <<<<<<< HEAD
+<<<<<<< HEAD
     }
 
     export interface ILayer extends ILayerSettings {
 =======
 
 >>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
+=======
+    }
+
+    export interface ILayer extends ILayerSettings {
+>>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
         // Common methods
         init: (hcb: bluefile.BlueHeader, ...args: any[]) => void;
         _onpipewrite: () => void;
