@@ -31,9 +31,13 @@ export declare module plugins {
     export interface IAnnotation        extends _IAnnotation {}
     export type      Annotations        =       _Annotations;
 <<<<<<< HEAD
+<<<<<<< HEAD
     export type      AnnotationValue    =       _AnnotationValue;
 =======
 >>>>>>> Added reference to plugins module from sigplot, as now in the js.
+=======
+    export type      AnnotationValue    =       _AnnotationValue;
+>>>>>>> Missed include of the AnnotationValue type
 
     // Boxes
     export class     BoxesPlugin   extends _BoxesPlugin {}
