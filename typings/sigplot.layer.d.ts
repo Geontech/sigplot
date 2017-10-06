@@ -4,7 +4,7 @@ import { bluefile } from './bluefile';
 import { Plot } from './sigplot';
 
 export declare module layer {
-    export interface ILayer {
+    export interface ILayerSettings {
         plot?: Plot;
 
         offset?: number;
@@ -21,11 +21,11 @@ export declare module layer {
         size?: number;
 
         display?: boolean;
-        color?: number;
-        line?: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
-        thick?: number; // negative for dashed
-        symbol?: number;
-        radius?: number;
+        color?:   number | string;
+        line?:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
+        thick?:   number; // negative for dashed
+        symbol?:  number;
+        radius?:  number;
 
         skip?: number; // number of elements between ord values
         xsub?: number;
@@ -36,7 +36,9 @@ export declare module layer {
         preferred_origin?: number;
 
         options?: object;
+    }
 
+    export interface ILayer extends ILayerSettings {
         // Common methods
         init: (hcb: bluefile.BlueHeader, ...args: any[]) => void;
         _onpipewrite: () => void;
