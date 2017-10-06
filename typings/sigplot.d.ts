@@ -5,6 +5,7 @@ export * from './mx';
 export * from './sigplot.layer';
 export * from './sigplot.layer1d';
 export * from './sigplot.layer2d';
+export * from './plugins';
 
 export { Layer1D } from './sigplot.layer1d';
 export { Layer2D } from './sigplot.layer2d';
