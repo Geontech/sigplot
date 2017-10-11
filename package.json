@@ -7,7 +7,8 @@
   "typings": "./typings/sigplot.d.ts",
   "files": [
     "js",
-    "dist"
+    "dist",
+    "typings"
   ],
   "author": {
     "name": "LGS Innovations, Inc.",
