@@ -58,4 +58,6 @@ export declare class Layer2D implements layer.ILayer {
     prep(xmin: number, xmax: number): number;
 
     draw(): void;
+
+    static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
 }
