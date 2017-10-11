@@ -109,4 +109,6 @@ export declare class Layer1D implements layer.ILayer {
     get_highlights(): IHighlight[];
 
     clear_highlights(): void;
+
+    static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
 }
