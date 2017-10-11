@@ -62,6 +62,7 @@ export declare class Layer2D implements layer.ILayer {
     draw(): void;
 
     static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
+<<<<<<< HEAD
 =======
 export declare module layer2d {
     export class Layer2D implements layer.ILayer {
@@ -130,4 +131,6 @@ export declare class Layer2D implements layer.ILayer {
 =======
     draw(): void;
 >>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
+=======
+>>>>>>> Added static 'overlay' methods
 }

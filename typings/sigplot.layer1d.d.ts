@@ -128,6 +128,7 @@ export declare class Layer1D implements layer.ILayer {
 
     clear_highlights(): void;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
 }
@@ -243,5 +244,9 @@ export declare module layer1d {
 }
 >>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
 =======
+=======
+
+    static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
+>>>>>>> Added static 'overlay' methods
 }
 >>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
