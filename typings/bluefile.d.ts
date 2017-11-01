@@ -21,6 +21,7 @@ export declare module bluefile {
 
         data_start?: number;
         data_size?:  number;
+        pipesize?:   number;
         ext_header?: object;
 
         spa?:   number;
