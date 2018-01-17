@@ -7,7 +7,6 @@
   "typings": "./typings/sigplot.d.ts",
   "files": [
     "js",
-<<<<<<< HEAD
     "dist/bluefile-debug.js",
     "dist/bluefile-minimized.js",
     "dist/matfile-debug.js",
@@ -16,10 +15,6 @@
     "dist/sigplot-minimized.js",
     "dist/sigplot.plugins-debug.js",
     "dist/sigplot.plugins-minimized.js"
-=======
-    "dist",
-    "typings"
->>>>>>> Added typings as part of the deployed library
   ],
   "author": {
     "name": "LGS Innovations, Inc.",
