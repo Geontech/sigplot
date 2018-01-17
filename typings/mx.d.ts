@@ -64,5 +64,17 @@ export declare module mx {
         y2: number; // bottom edge relative to window (pixels)
     }
 
+    /** Pasted from SigPlot's mx.js
+     * @param {Object} Mx - the Mx object
+     * @param {number} x - the real-world x coordinate
+     * @param {number} y - the real-world y coordinate
+     * @param {boolean} [clip=false] set to clip the returned value to the plot area
+     * @returns {Object} pixel - the x,y coordinates in pixel coordinate space
+     * @returns {number} pixel.clipped - true if the point would have or has been clipped
+     * @private
+     */
+    export function real_to_pixel(Mx: any, x: number, y: number, clip?: boolean):
+        { x: number, y: number, clipped?: boolean };
+    
     /** FIXME: Incomplete declaration.  Stopped at line 105, mx.js */
 }
