@@ -16,6 +16,10 @@
   "files": [
     "js",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    "typings",
+>>>>>>> Bug: Forgot to add back typings on deliverable files after rebase
     "dist/bluefile-debug.js",
     "dist/bluefile-minimized.js",
     "dist/matfile-debug.js",
