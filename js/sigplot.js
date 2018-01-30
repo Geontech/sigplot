@@ -1162,12 +1162,14 @@
 
                 // Event processing
                 if (plot.mouseOnCanvas) {
-                    event.preventDefault();
+                    if (Gx.wheelscroll_enable) {
+                        event.preventDefault();
 
-                    if (inPan.inPanRegion) {
-                        throttledPan(inPan);
-                    } else if (Gx.wheelZoom) {
-                        throttledZoom();
+                        if (inPan.inPanRegion) {
+                            throttledPan(inPan);
+                        } else if (Gx.wheelZoom) {
+                            throttledZoom();
+                        }
                     }
                 }
             };
@@ -1734,6 +1736,10 @@
          *            is null to disable right-click boxes
          *
          * @param {String}
+         *            settings.wheelscroll_enable true enables the scroll wheel 
+         *            functionality (for things like zooming)
+         * 
+         * @param {String}
          *            settings.wheelscroll_mode_natural true indicates natural
          *            mode, where scrolling the mousewheel forward will pan down
          *            and backwards will pan up
@@ -2004,6 +2010,10 @@
 
             if (settings.rightclick_rubberbox_mode !== undefined) {
                 Gx.default_rightclick_rubberbox_mode = settings.rightclick_rubberbox_mode;
+            }
+
+            if (settings.wheelscroll_enable !== undefined) {
+                Gx.wheelscroll_enable = settings.wheelscroll_enable;
             }
 
             if (settings.wheelscroll_mode_natural !== undefined) {
@@ -3829,6 +3839,7 @@
         this.default_rubberbox_action = "zoom";
         this.default_rubberbox_mode = "box";
 
+        this.wheelscroll_enable = false;
         this.wheelscroll_mode_natural = true;
         this.scroll_time_interval = 10;
 
@@ -4612,6 +4623,16 @@
                                 plot
                                     .change_settings({
                                         wheelscroll_mode_natural: !Gx.wheelscroll_mode_natural
+                                    });
+                            }
+                        }, {
+                            text: "Mousewheel Enable",
+                            checked: Gx.wheelscroll_enable,
+                            style: "checkbox",
+                            handler: function() {
+                                plot
+                                    .change_settings({
+                                        wheelscroll_enable: !Gx.wheelscroll_enable
                                     });
                             }
                         }]
