@@ -3,7 +3,7 @@
   "description": "Advanced plotting for signal processing applications",
   "version": "2.0.0-rc2",
   "homepage": "http://sigplot.lgsinnovations.com",
-  "main":    "./js/sigplot.js",
+  "main": "./js/sigplot.js",
   "typings": "./typings/sigplot.d.ts",
   "files": [
     "js",

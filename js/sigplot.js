@@ -1699,6 +1699,9 @@
          *
          * @param {Boolean}
          *            settings.specs turns on and off specs
+         * 
+         * @param {Boolean}
+         *            settings.show_axis_on_plot
          *
          * @param {String}
          *            settings.xcnt "leftmouse", "continuous", "disable",
@@ -1879,6 +1882,16 @@
                     Gx.show_readout = false;
                 }
             }
+            if (settings.show_axis_on_plot) {
+                if (settings.show_axis_on_plot === null) {
+                  Gx.show_axis_on_plot = !Gx.show_axis_on_plot;
+                } else {
+                  Gx.show_axis_on_plot = settings.show_axis_on_plot;
+                }
+                Gx.specs = false;
+              } else {
+                Gx.specs = true;
+              }
 
             if (settings.xcnt !== undefined) {
                 if (settings.xcnt === "leftmouse") {
@@ -3420,6 +3433,9 @@
                 Gx.pt = (Mx.t - Gx.pthk) / 2;
                 Gx.lbtn = 0;
             }
+            if (Gx.show_axis_on_plot) {
+                Mx.text_h = -10;
+            }
 
             // pan select ranges
             Gx.pyl = Mx.r + (Mx.width - Mx.r - Gx.pthk) / 2 + 1;
@@ -3603,16 +3619,28 @@
                     Gx.legendBtnLocation = null;
                 }
             } else if (Gx.grid && Gx.sections >= 0) {
-                var drawaxis_flags = {
-                    grid: true,
-                    noaxisbox: true,
-                    noxtics: true,
-                    noxtlab: true,
-                    noxplab: true,
-                    noytics: true,
-                    noytlab: true,
-                    noyplab: true
-                };
+                var drawaxis_flags;
+                if (Gx.show_axis_on_plot) {
+                    var drawaxis_flags = {
+                      grid: true,
+                      noaxisbox: true,
+                      noxtics: false,
+                      noxtlab: false, // actual axis numbers
+                      noytics: false,
+                      noytlab: false // actual axis numbers
+                    };
+                  } else {
+                    var drawaxis_flags = {
+                        grid: true,
+                        noaxisbox: true,
+                        noxtics: true,
+                        noxtlab: true,
+                        noxplab: true,
+                        noytics: true,
+                        noytlab: true,
+                        noyplab: true
+                    };
+                  }
                 mx.drawaxis(Gx, Mx, Gx.xdiv, Gx.ydiv, xlab, ylab,
                     drawaxis_flags);
             }
@@ -3804,6 +3832,7 @@
         this.index = false;
         this.pan = true;
         this.specs = true;
+        this.show_axis_on_plot = false;
         this.legend = true;
         this.xdata = false;
 
@@ -4720,6 +4749,15 @@
                     handler: function() {
                         plot.change_settings({
                             specs: !Gx.specs
+                        });
+                    }
+                }, {
+                    text: "Show Axis On Plot",
+                    checked: Gx.show_axis_on_plot,
+                    style: "checkbox",
+                    handler: function() {
+                        plot.change_settings({
+                          show_axis_on_plot: !Gx.show_axis_on_plot
                         });
                     }
                 }, {
@@ -6717,6 +6755,11 @@
             Gx.show_x_axis = false;
             Gx.show_y_axis = false;
             Gx.show_readout = false;
+        }
+        if (Gx.show_axis_on_plot) {
+            Gx.specs = false;
+        } else {
+            Gx.specs = true;
         }
         Gx.hide_note = o.hide_note || false;
 
