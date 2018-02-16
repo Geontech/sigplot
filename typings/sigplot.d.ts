@@ -79,7 +79,7 @@ export interface IConstructorOptions extends ISettingsOptions {
      */
     nomenu?:  boolean,
 
-        /**
+    /**
     * set to true to disable the plot specification displays
     */
     nospecs?:  boolean,
@@ -368,6 +368,7 @@ export interface ISettingsOptions {
     show_y_axis?:                  boolean;
     show_readout?:                 boolean;
     specs?:                        boolean;
+    show_axis_on_plot?:            boolean;
     xcnt?:                         string;  // leftmouse, continuous, disable (null), enable
     legend?:                       boolean;
     pan?:                          boolean;
