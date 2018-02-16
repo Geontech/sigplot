@@ -3,9 +3,13 @@
   "description": "Advanced plotting for signal processing applications",
   "version": "2.0.0-rc2",
   "homepage": "http://sigplot.lgsinnovations.com",
+<<<<<<< HEAD
   "main":    "./js/sigplot.js",
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+  "main": "./js/sigplot.js",
+>>>>>>> Added `show_axis_on_plot` setting to hide spec except for axis (on plot)
   "typings": "./typings/sigplot.d.ts",
 =======
   "typings": "./js/sigplot.d.ts",
