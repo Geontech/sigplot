@@ -83,7 +83,7 @@ export interface IConstructorOptions extends ISettingsOptions {
     * set to true to disable the plot specification displays but show axis over plot
     */
 
-    show_axis_on_plot?:  boolean;
+    show_axis_on_plot?:  boolean,
 
     /**
     * set to true to disable the plot specification displays
