@@ -1894,16 +1894,16 @@
                     Gx.show_readout = false;
                 }
             }
-            if (settings.show_axis_on_plot) {
+            if (settings.show_axis_on_plot !== undefined) {
                 if (settings.show_axis_on_plot === null) {
-                  Gx.show_axis_on_plot = !Gx.show_axis_on_plot;
+                    Gx.show_axis_on_plot = !Gx.show_axis_on_plot;
                 } else {
-                  Gx.show_axis_on_plot = settings.show_axis_on_plot;
+                    Gx.show_axis_on_plot = settings.show_axis_on_plot;
                 }
                 Gx.specs = false;
-              } else {
+            } else {
                 Gx.specs = true;
-              }
+            }
 
             if (settings.xcnt !== undefined) {
                 if (settings.xcnt === "leftmouse") {
@@ -3618,8 +3618,10 @@
                       noaxisbox: true,
                       noxtics: false,
                       noxtlab: false, // actual axis numbers
+                      noxplab: true,
                       noytics: false,
-                      noytlab: false // actual axis numbers
+                      noytlab: false, // actual axis numbers
+                      noyplab: true
                     };
                   } else {
                     var drawaxis_flags = {
@@ -3795,7 +3797,6 @@
         this.index = false;
         this.pan = true;
         this.specs = true;
-        this.show_axis_on_plot = false;
         this.legend = true;
         this.xdata = false;
 
@@ -6715,6 +6716,7 @@
             Gx.show_y_axis = false;
             Gx.show_readout = false;
         }
+        Gx.show_axis_on_plot = o.show_axis_on_plot === undefined ? false : o.show_axis_on_plot;
         if (Gx.show_axis_on_plot) {
             Gx.specs = false;
         } else {
