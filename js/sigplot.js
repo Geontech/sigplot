@@ -1196,7 +1196,7 @@
 
                         if (Mx.widget && (Mx.widget.type === "ONESHOT")) {
                             Mx.widget = null;
-                            plot.refresh();
+                            // plot.refresh();
                             return;
                         }
 
@@ -1499,19 +1499,21 @@
                         } else if (keyCode === 63) { // '?'
                             mx.message(Mx, MAIN_HELP);
                         } else if (keyCode === 102) { // 'f'
-                            var switcher = 0;
-                            if (Gx.p_cuts) {
-                                plot.change_settings({
-                                    p_cuts: !Gx.p_cuts
-                                });
-                                switcher = 1;
-                            }
-                            mx.fullscreen(Mx);
-                            plot.refresh();
-                            if (switcher === 1) {
-                                plot.change_settings({
-                                    p_cuts: !Gx.p_cuts
-                                });
+                            if (!Gx.show_axis_on_plot) {
+                                var switcher = 0;
+                                if (Gx.p_cuts) {
+                                    plot.change_settings({
+                                        p_cuts: !Gx.p_cuts
+                                    });
+                                    switcher = 1;
+                                }
+                                mx.fullscreen(Mx);
+                                plot.refresh();
+                                if (switcher === 1) {
+                                    plot.change_settings({
+                                        p_cuts: !Gx.p_cuts
+                                    });
+                                }
                             }
                         } else if ((keyCode === 9) && (event.ctrlKey)) { // ctrl-i
                             plot.change_settings({
