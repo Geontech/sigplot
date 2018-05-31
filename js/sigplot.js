@@ -1523,10 +1523,6 @@
                         } else if (keyCode === 63) { // '?'
                             mx.message(Mx, MAIN_HELP);
                         } else if (keyCode === 102) { // 'f'
-<<<<<<< HEAD
-                            mx.fullscreen(Mx);
-                            plot.refresh();
-=======
                             if (!Gx.show_axis_on_plot) {
                                 var switcher = 0;
                                 if (Gx.p_cuts) {
@@ -1543,7 +1539,6 @@
                                     });
                                 }
                             }
->>>>>>> Disabled "Fullscreen" feature when "show_axis_on_plot" is enabled
                         } else if ((keyCode === 9) && (event.ctrlKey)) { // ctrl-i
                             plot.change_settings({
                                 invert: null

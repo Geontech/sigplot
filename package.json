@@ -3,39 +3,12 @@
   "description": "Advanced plotting for signal processing applications",
   "version": "2.0.0-rc2",
   "homepage": "http://sigplot.lgsinnovations.com",
-<<<<<<< HEAD
-  "main":    "./js/sigplot.js",
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   "main": "./js/sigplot.js",
->>>>>>> Added `show_axis_on_plot` setting to hide spec except for axis (on plot)
   "typings": "./typings/sigplot.d.ts",
-=======
-  "typings": "./js/sigplot.d.ts",
->>>>>>> Initial commit of top-level typings for interfaces in SigPlot 2.0.
-=======
-  "typings": "./typings/sigplot.d.ts",
->>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
   "files": [
     "js",
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    "typings",
->>>>>>> Bug: Forgot to add back typings on deliverable files after rebase
-    "dist/bluefile-debug.js",
-    "dist/bluefile-minimized.js",
-    "dist/matfile-debug.js",
-    "dist/matfile-minimized.js",
-    "dist/sigplot-debug.js",
-    "dist/sigplot-minimized.js",
-    "dist/sigplot.plugins-debug.js",
-    "dist/sigplot.plugins-minimized.js"
-=======
     "dist",
     "typings"
->>>>>>> Added typings as part of the deployed library
   ],
   "author": {
     "name": "LGS Innovations, Inc.",
