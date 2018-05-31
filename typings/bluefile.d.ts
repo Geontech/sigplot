@@ -21,14 +21,7 @@ export declare module bluefile {
 
         data_start?: number;
         data_size?:  number;
-<<<<<<< HEAD
-<<<<<<< HEAD
         pipesize?:   number;
-=======
->>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
-=======
-        pipesize?:   number;
->>>>>>> Added pipesize to bluefile header options which can be used to expand the array buffer for very large data sets.
         ext_header?: object;
 
         spa?:   number;

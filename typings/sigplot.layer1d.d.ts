@@ -3,10 +3,6 @@ import { Plot } from './sigplot';
 import { bluefile } from './bluefile';
 import { m } from './m';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
 export interface IPrep {
     num:   number;
     start: number;
@@ -40,25 +36,11 @@ export declare class Layer1D implements layer.ILayer {
     size: number;
 
     display: boolean;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
-    color:   number | string;
-    line:    number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
-    thick:   number; // negative for dashed
-    symbol:  number;
-    radius:  number;
-<<<<<<< HEAD
-=======
     color: number;
     line: number; // 0=none, 1-vertical, 2-horizontal, 3-connecting
     thick: number; // negative for dashed
     symbol: number;
     radius: number;
->>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
-=======
->>>>>>> Split basic layer interface of 'settings' off of the now derived interface that also defines required methods that are common between Layer1D and Layer2D's definitions.  Also corrected member declaration for color to include string as an allowed type.
 
     skip: number; // number of elements between ord values
     xsub: number;
@@ -127,12 +109,9 @@ export declare class Layer1D implements layer.ILayer {
     get_highlights(): IHighlight[];
 
     clear_highlights(): void;
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
 }
-=======
 export declare module layer1d {
     export interface IPrep {
         num:   number;
@@ -242,11 +221,3 @@ export declare module layer1d {
         clear_highlights(): void;
     }
 }
->>>>>>> Moved typings to 'typings' subdirectory and adjusted package.json accordingly.  Then filled out most of remaining public interfaces and other guesses at these interfaces.
-=======
-=======
-
-    static overlay(plot: Plot, hcb: bluefile.BlueHeader, options: object);
->>>>>>> Added static 'overlay' methods
-}
->>>>>>> Refactored each definition so that the exported member is not within a module.  This was causing a lookup error at runtime, making the exported interfaces be treated as undefined by webpack, etc., which would kill Angular UIs.
