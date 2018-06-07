@@ -68,6 +68,7 @@
         this.xdata = false; // true if X data is data from file
         this.modified = false;
         this.opacity = 1.0;
+        this.fillStyle = null;
         this.preferred_origin = 1;
 
         this.pointbufsize = 0;
@@ -170,32 +171,46 @@
 
             var tle = this.tle; // in scalars
             if (tle === undefined) {
+                // if the transfer length wasn't set then we read
+                // all the elements that are available
                 tle = Math.floor(m.pavail(this.hcb)) / this.hcb.spa;
-            } else if (m.pavail(this.hcb) < (tle * this.hcb.spa)) {
-                return;
             }
 
+            // Calculate transfer length in scalars
             var tl = tle * this.hcb.spa;
+            while (m.pavail(this.hcb) >= tl) {
 
-            if (this.drawmode === "lefttoright") {
-                this.position = 0;
-                ybuf.set(ybuf.subarray(0, this.size - tl), tl);
-            } else if (this.drawmode === "righttoleft") {
-                this.position = this.size - tle;
-                ybuf.set(ybuf.subarray(tl), 0);
-            } else if (this.drawmode === "scrolling") {
-                // Nothing to do
-            } else {
-                throw "Invalid draw mode";
+                if (this.drawmode === "lefttoright") {
+                    this.position = 0;
+                    ybuf.set(ybuf.subarray(0, this.size - tl), tl);
+                } else if (this.drawmode === "righttoleft") {
+                    this.position = this.size - tle;
+                    ybuf.set(ybuf.subarray(tl), 0);
+                } else if (this.drawmode === "scrolling") {
+                    // Nothing to do
+                } else {
+                    throw "Invalid draw mode";
+                }
+
+                // transfer length is adjusted to the remaining size 
+                // before wrapping
+                var ngot = m.grabx(
+                    this.hcb, ybuf,
+                    Math.min(tle, this.size - this.position) * this.hcb.spa,
+                    this.position * this.hcb.spa
+                );
+                if (ngot === 0) {
+                    break;
+                }
+
+                // update the position
+                this.position = (this.position + tle) % this.size;
+
+                if (this.tle === undefined) {
+                    tle = Math.floor(m.pavail(this.hcb)) / this.hcb.spa;
+                }
+                tl = tle * this.hcb.spa;
             }
-
-            tle = Math.min(tle, this.size - this.position);
-            var ngot = m.grabx(this.hcb, ybuf, tle * this.hcb.spa, this.position * this.hcb.spa);
-            if (ngot === 0) {
-                return;
-            }
-
-            this.position = (this.position + tle) % this.size;
 
             if (this.plot._Gx.autol !== 0) {
                 this.plot.rescale();
@@ -584,7 +599,11 @@
             var line = 0;
             var traceoptions = {};
 
-            traceoptions.fillStyle = Gx.fillStyle;
+            if (this.fillStyle) {
+                traceoptions.fillStyle = this.fillStyle;
+            } else if (Gx.fillStyle) {
+                traceoptions.fillStyle = Gx.fillStyle;
+            }
             if (this.options) {
                 traceoptions.highlight = this.options.highlight;
                 traceoptions.noclip = this.options.noclip;
@@ -872,7 +891,11 @@
                     layer[layerOption] = layerOptions[layerOption];
                 }
             }
-            plot.add_layer(layer);
+            if (plot.add_layer(layer)) {
+                return layer;
+            } else {
+                return null;
+            }
         }
     };
 

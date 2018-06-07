@@ -74,12 +74,13 @@ module.exports = function (grunt) {
         },
         qunit: {
             options: { '--web-security': 'no', '--local-to-remote-url-access': 'yes' },
-            all: ['test/passfail.html']
+            all: ['test/test.html']
         },
         'closure-compiler': {
             bluefile_debug: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/bluefile.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/bluefile-debug.js',
                 options: {
                     formatting: 'PRETTY_PRINT',
@@ -89,6 +90,7 @@ module.exports = function (grunt) {
             matfile_debug: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/matfile.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/matfile-debug.js',
                 options: {
                     formatting: 'PRETTY_PRINT',
@@ -98,6 +100,7 @@ module.exports = function (grunt) {
             sigplot_debug: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/sigplot.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/sigplot-debug.js',
                 options: {
                     formatting: 'PRETTY_PRINT',
@@ -107,6 +110,7 @@ module.exports = function (grunt) {
             sigplot_plugins_debug: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/sigplot.plugins.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/sigplot.plugins-debug.js',
                 options: {
                     formatting: 'PRETTY_PRINT',
@@ -116,6 +120,7 @@ module.exports = function (grunt) {
             bluefile_minimized: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/bluefile.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/bluefile-minimized.js',
                 options: {
                     compilation_level: 'SIMPLE_OPTIMIZATIONS'
@@ -124,6 +129,7 @@ module.exports = function (grunt) {
             matfile_minimized: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/matfile.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/matfile-minimized.js',
                 options: {
                     compilation_level: 'SIMPLE_OPTIMIZATIONS'
@@ -132,6 +138,7 @@ module.exports = function (grunt) {
             sigplot_minimized: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/sigplot.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/sigplot-minimized.js',
                 options: {
                     compilation_level: 'SIMPLE_OPTIMIZATIONS'
@@ -140,6 +147,7 @@ module.exports = function (grunt) {
             sigplot_plugins_minimized: {
                 closurePath: 'support/google-closure-compiler',
                 js: 'dist/sigplot.plugins.js',
+                maxBuffer: 500,
                 jsOutputFile: 'dist/sigplot.plugins-minimized.js',
                 options: {
                     compilation_level: 'SIMPLE_OPTIMIZATIONS'
@@ -182,13 +190,11 @@ module.exports = function (grunt) {
                 }],
             },
         },
-        web_server: {
-            options: {
-                cors: true,
-                nevercache: true,
-                logRequests: true
+        'http-server': {
+            'test': {
+                cache: 0,
+                port: 1337
             },
-            foo: 'bar' // necessary for some odd reason, see the docs
         },
         jsbeautifier: {
             check: {
@@ -298,7 +304,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-web-server');
+    grunt.loadNpmTasks('grunt-http-server');
     grunt.loadNpmTasks('grunt-jsbeautifier');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-express-server');
@@ -319,5 +325,8 @@ module.exports = function (grunt) {
     // Benchmark in browsers.
     grunt.registerTask('benchtest', ['express:test', 'karma:bench']);
     grunt.registerTask('build_and_test', ['build', 'benchtest']);
+
+    // for compatibility with the old grunt commands
+    grunt.registerTask('web_server', 'http-server');
     
 };

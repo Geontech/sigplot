@@ -427,12 +427,13 @@
          * @param   littleEndian
          */
         unpack_keywords: function(buf, lbuf, offset, littleEndian) {
-            var lkey, lextra, ltag, format, tag, data, ldata, itag, idata, dvk;
+            var lkey, lextra, ltag, format, tag, data, ldata, itag, idata;
             var keywords = [];
             var dic_index = {};
             var dict_keywords = {};
             var ii = 0;
-            buf = buf.slice(offset, buf.length);
+            window.buf = buf;
+            buf = buf.slice(offset, buf.byteLength);
             var dvhdr = new DataView(buf);
             buf = ab2str(buf);
             while (ii < lbuf) {
@@ -504,6 +505,10 @@
                 length = buf.length || (buf.byteLength / _BPS[this.format[1]]);
             }
             if (buf) {
+                // Flatten 2-D array into 1-D
+                if (Array.isArray(buf) && Array.isArray(buf[0])) {
+                    buf = [].concat.apply([], buf);
+                }
                 return new TypedArray(buf, offset, length);
             } else {
                 return new TypedArray(length);

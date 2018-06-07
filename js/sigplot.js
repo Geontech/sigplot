@@ -96,6 +96,30 @@
         "View the function of all keypresses by selecting 'Keypress Info' from the main menu.";
 
     /**
+     * Options used when displaying the spinner.
+     *
+     * @memberOf sigplot
+     * @private
+     */
+    var SPINNER_OPTS = {
+        lines: 13, // The number of lines to draw
+        length: 7, // The length of each line
+        width: 4, // The line thickness
+        radius: 10, // The radius of the inner circle
+        corners: 1, // Corner roundness (0..1)
+        rotate: 0, // The rotation offset
+        color: '#FFF', // #rgb or #rrggbb
+        speed: 1, // Rounds per second
+        trail: 60, // Afterglow percentage
+        shadow: false, // Whether to render a shadow
+        hwaccel: false, // Whether to use hardware acceleration
+        className: 'spinner', // The CSS class to assign to the spinner
+        zIndex: 2e9, // The z-index (defaults to 2000000000)
+        top: 'auto', // Top position relative to parent in px
+        left: 'auto' // Left position relative to parent in px
+    };
+
+    /**
      * Attempts basic checks to determine if the browser is compatible with
      * sigplot.
      *
@@ -277,6 +301,15 @@
      *            the font family to use for text rendered on the plot.  Monospace
      *            font will generally work best.
      *
+     * @param {Boolean}
+     *            options.font_scaled mimic the MIDAS plotting behaviour where the
+     *            plot font-size is scaled relative to the width of the
+     *
+     * @param {Boolean}
+     *            options.font_width sets the font width (default=8); if scaled_font
+     *            is set to true, then the font width will be the minimum of font_width
+     *            or plot width/64.
+     *
      * @returns {sigplot.Plot}
      */
     sigplot.Plot = function(element, options) {
@@ -355,7 +388,7 @@
                     } else {
                         if (plot.mouseOnCanvas) {
                             draw_crosshairs(plot);
-                            if (Gx.p_cuts && Gx.lyr[0] && (Gx.lyr[0].hcb["class"] === 2)) {
+                            if (Gx.p_cuts && (Gx.lyr.length === 1) && (Gx.lyr[0].hcb["class"] === 2)) {
                                 if (!Gx.y_cut_press_on && !Gx.x_cut_press_on) {
                                     draw_p_cuts(plot);
                                 }
@@ -1264,18 +1297,9 @@
                                 specs: !Gx.specs
                             });
                         } else if (keyCode === 112) { // 'p'
-                            if (Gx.lyr[0].hcb["class"] !== 1) {
-                                Gx.p_press = true;
-                                if (Gx.lyr[0].buf.length === Gx.lyr[0].hcb.subsize) {
-                                    plot.change_settings({
-                                        enabled_streaming_pcut: !Gx.enabled_streaming_pcut
-                                    });
-                                } else {
-                                    plot.change_settings({
-                                        p_cuts: !Gx.p_cuts
-                                    });
-                                }
-                            }
+                            plot.change_settings({
+                                p_cuts: !Gx.p_cuts
+                            });
                         } else if (keyCode === 120) { // 'x'
                             if (Gx.x_cut_press_on) {
                                 Gx.x_cut_press_on = false;
@@ -2182,45 +2206,13 @@
                 Gx.lg_colorbar = !Gx.lg_colorbar;
             }
 
-            if (settings.enabled_streaming_pcut !== undefined) {
-                Gx.enabled_streaming_pcut = !Gx.enabled_streaming_pcut;
-                if (Gx.enabled_streaming_pcut === false) {
-                    //clear the zbuf
-                    Gx.lyr[0].zbuf = [];
-                    //ensure that the elements have a parent to remove them.
-                    if (Gx.element1.parentNode === null) {
-                        document.getElementById(this._Gx.parent.id).appendChild(this._Gx.element1);
-                    }
-                    if (Gx.element2.parentNode === null) {
-                        document.getElementById(this._Gx.parent.id).appendChild(this._Gx.element2);
-                    }
-
-                    Gx.element1.parentNode.removeChild(Gx.element1);
-                    Gx.element2.parentNode.removeChild(Gx.element2);
-                    Gx.ycut = undefined;
-                    Gx.xcut = undefined;
-                }
-                Gx.parent.setAttribute("style", "position:relative");
-            }
-
             if (settings.p_cuts !== undefined) {
                 // Change the plot area and then draw the p_cuts dipslay
-                Gx.p_cuts = !Gx.p_cuts;
-                if (Gx.p_cuts === false) {
-                    //ensure that the elements have a parent to remove them.
-                    if (Gx.element1.parentNode === null) {
-                        document.getElementById(this._Gx.parent.id).appendChild(this._Gx.element1);
-                    }
-                    if (Gx.element2.parentNode === null) {
-                        document.getElementById(this._Gx.parent.id).appendChild(this._Gx.element2);
-                    }
-
-                    Gx.element1.parentNode.removeChild(Gx.element1);
-                    Gx.element2.parentNode.removeChild(Gx.element2);
-                    Gx.ycut = undefined;
-                    Gx.xcut = undefined;
+                if (settings.p_cuts === null) {
+                    Gx.p_cuts = !Gx.p_cuts;
+                } else {
+                    Gx.p_cuts = settings.p_cuts;
                 }
-                Gx.parent.setAttribute("style", "position:relative");
             }
 
             //this is a setting that is true if we are drawing an xcut
@@ -2404,14 +2396,8 @@
             }
 
             if (rsync) {
-                if (Gx.enabled_streaming_pcut) {
-                    draw_p_cuts(this);
-                }
                 this._refresh();
             } else {
-                if (Gx.enabled_streaming_pcut) {
-                    draw_p_cuts(this);
-                }
                 this.refresh();
             }
         },
@@ -2659,12 +2645,15 @@
             // Notify listeners that a file was overlayed
             var evt = document.createEvent('Event');
             evt.initEvent('lyradd', true, true);
-            evt.index = Gx.lyr.length; // the new index of the layer
             evt.name = layer.name; // the name of the layer
             evt.layer = layer;
             var executeDefault = mx.dispatchEvent(Mx, evt);
             if (executeDefault) {
                 Gx.lyr.push(layer);
+                layer.index = Gx.lyr.length - 1; // the new index of the layer
+                return true;
+            } else {
+                return false;
             }
         },
 
@@ -2717,22 +2706,32 @@
                 basefile(this, true);
             }
 
-            var newlayer = Gx.lyr.length;
+            var layer = null;
 
             if (layerOptions.layerType === undefined) {
                 if (hcb["class"] === 1) {
-                    Layer1D.overlay(this, hcb, layerOptions);
+                    layer = Layer1D.overlay(this, hcb, layerOptions);
                 } else if (hcb["class"] === 2) {
-                    Layer2D.overlay(this, hcb, layerOptions);
+                    layer = Layer2D.overlay(this, hcb, layerOptions);
                 }
             } else {
                 if (layerOptions.layerType === "1D") {
-                    Layer1D.overlay(this, hcb, layerOptions);
+                    layer = Layer1D.overlay(this, hcb, layerOptions);
                 } else if (layerOptions.layerType === "2D") {
-                    Layer2D.overlay(this, hcb, layerOptions);
+                    layer = Layer2D.overlay(this, hcb, layerOptions);
                 } else {
-                    layerOptions.layerType.overlay(this, hcb, layerOptions);
+                    layer = layerOptions.layerType.overlay(this, hcb, layerOptions);
                 }
+            }
+
+            if (!layer) {
+                m.log.debug("failed to create layer");
+                return;
+            }
+
+            // Allow the user to store aribitary data with the layer
+            if (layerOptions.user_data) {
+                layer.user_data = layerOptions.user_data;
             }
 
             // TODO - do we want to alert like the XM plot did?
@@ -2747,10 +2746,11 @@
             // And then loading a file.
             changemode(this, Gx.cmode);
 
+            // if this is not the first set of layers added and
+            // we haven't asked for the plot to expand to accomodate
+            // this layers new range, then simply draw the new layer.
             if (!basefiles && !layerOptions.expand) {
-                for (var n = newlayer; n < Gx.lyr.length; n++) {
-                    draw_layer(this, n);
-                }
+                draw_layer(this, layer);
             } else {
                 if (Gx.HCB.length === 0) { // TODO dead code that cannot be reached
                     basefile(this, false);
@@ -2762,7 +2762,7 @@
                         xmin = Gx.xmin;
                     }
                     if ((Gx.autox & 2) === 0) {
-                        xmax = Gx.xmin;
+                        xmax = Gx.xmax;
                     }
                     scale_base(this, {
                         get_data: true
@@ -3318,7 +3318,11 @@
             if (Gx.hold) {
                 return;
             }
-            mx.set_font(Mx, Math.min(8, Mx.width / 64));
+            var font_width = Mx.font_width;
+            if (Mx.font_scaled) {
+                font_width = Math.min(Mx.font_width, Mx.width / 64);
+            }
+            mx.set_font(Mx, font_width);
             Gx.pthk = Mx.text_w * 1.5;
 
             if (Gx.specs) {
@@ -3449,7 +3453,7 @@
 
             }
 
-            if ((Gx.p_cuts || Gx.enabled_streaming_pcut) && (Gx.lyr[0].hcb["class"] === 2)) {
+            if (Gx.p_cuts && (Gx.lyr.length === 1) && (Gx.lyr[0].hcb["class"] === 2)) {
                 //turn cross hairs on
                 Gx.cross = true;
 
@@ -3649,12 +3653,7 @@
                     drawaxis_flags);
             }
 
-            for (var n = 0; n < Gx.lyr.length; n++) {
-                //if (Gx.sections !== 0) {
-                // TODO
-                //}
-                draw_layer(this, n);
-            }
+            draw_layers(this);
 
             draw_accessories(this, 4);
 
@@ -3667,7 +3666,7 @@
             Gx.cross_ypos = undefined;
             if ((!Mx.warpbox) && (this.mouseOnCanvas)) {
                 draw_crosshairs(this);
-                if (!Gx.y_cut_press_on && !Gx.x_cut_press_on && Gx.lyr[0] && (Gx.lyr[0].hcb["class"] === 2)) {
+                if (!Gx.y_cut_press_on && !Gx.x_cut_press_on && (Gx.lyr.length === 1) && (Gx.lyr[0].hcb["class"] === 2)) {
                     draw_p_cuts(this);
                 }
             }
@@ -3682,30 +3681,6 @@
     // /////////////////////////////////////////////////////////////////////////
     // Private methods and objects
     // /////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Options used when displaying the spinner.
-     *
-     * @memberOf sigplot
-     * @private
-     */
-    var SPINNER_OPTS = {
-        lines: 13, // The number of lines to draw
-        length: 7, // The length of each line
-        width: 4, // The line thickness
-        radius: 10, // The radius of the inner circle
-        corners: 1, // Corner roundness (0..1)
-        rotate: 0, // The rotation offset
-        color: '#FFF', // #rgb or #rrggbb
-        speed: 1, // Rounds per second
-        trail: 60, // Afterglow percentage
-        shadow: false, // Whether to render a shadow
-        hwaccel: false, // Whether to use hardware acceleration
-        className: 'spinner', // The CSS class to assign to the spinner
-        zIndex: 2e9, // The z-index (defaults to 2000000000)
-        top: 'auto', // Top position relative to parent in px
-        left: 'auto' // Left position relative to parent in px
-    };
 
     /**
      * Map integer cmode to string equivalent.
@@ -3940,8 +3915,6 @@
         this.element1 = undefined;
         //div to hold y cut
         this.element2 = undefined;
-        //indicates that the p key was just pressed
-        this.p_press = false;
 
         //x and y sticky key configuration ("automatic" displays point on
         //1D and cut on 2D, "disable" doesn't display anything, "pop-up"
@@ -3952,8 +3925,6 @@
         //true if the y value is being displayed on plot
         this.y_pop_now = false;
 
-        //enables streaming p-cuts
-        this.enabled_streaming_pcut = false;
         //the drawmode and autol before the x or y cut was showing
         this.old_drawmode = undefined;
         this.old_autol = undefined;
@@ -4768,20 +4739,9 @@
                     checked: Gx.p_cuts,
                     style: "checkbox",
                     handler: function() {
-                        if (Gx.lyr[0].hcb["class"] !== 1) {
-                            plot.change_settings({
-                                p_cuts: !Gx.p_cuts
-                            });
-                            if (Gx.p_cuts === false) {
-                                //ensure that the elements exist to remove them.
-                                draw_p_cuts(plot);
-                                Gx.element1.parentNode.removeChild(Gx.element1);
-                                Gx.element2.parentNode.removeChild(Gx.element2);
-                                Gx.ycut = undefined;
-                                Gx.xcut = undefined;
-                            }
-                            Gx.parent.setAttribute("style", "position:relative");
-                        }
+                        plot.change_settings({
+                            p_cuts: !Gx.p_cuts
+                        });
                     }
                 }, {
                     text: "Large Colorbar",
@@ -5022,10 +4982,10 @@
                                     plot._Gx.lyr[index].thick = -1 * finalValue;
                                     plot._Gx.lyr[index].symbol = 0;
                                 } else {
-                                    for (var index = 0; index < Gx.lyr.length; index++) {
-                                        plot._Gx.lyr[index].line = 3;
-                                        plot._Gx.lyr[index].thick = -1 * finalValue;
-                                        plot._Gx.lyr[index].symbol = 0;
+                                    for (var ii = 0; ii < Gx.lyr.length; ii++) {
+                                        plot._Gx.lyr[ii].line = 3;
+                                        plot._Gx.lyr[ii].thick = -1 * finalValue;
+                                        plot._Gx.lyr[ii].symbol = 0;
                                     }
                                 }
                             }, thk);
@@ -5155,8 +5115,8 @@
                                         if (index !== undefined) {
                                             plot._Gx.lyr[index].color = finalValue;
                                         } else {
-                                            for (var index = 0; index < Gx.lyr.length; index++) {
-                                                plot._Gx.lyr[index].color = finalValue;
+                                            for (var ii = 0; ii < Gx.lyr.length; index++) {
+                                                plot._Gx.lyr[ii].color = finalValue;
                                             }
                                         }
                                     }, undefined, undefined, undefined, undefined);
@@ -5824,10 +5784,10 @@
                             plot._Gx.lyr[index].thick = -1 * finalValue;
                             plot._Gx.lyr[index].symbol = 0;
                         } else {
-                            for (var index = 0; index < Gx.lyr.length; index++) {
-                                plot._Gx.lyr[index].line = 3;
-                                plot._Gx.lyr[index].thick = -1 * finalValue;
-                                plot._Gx.lyr[index].symbol = 0;
+                            for (var ii = 0; ii < Gx.lyr.length; ii++) {
+                                plot._Gx.lyr[ii].line = 3;
+                                plot._Gx.lyr[ii].thick = -1 * finalValue;
+                                plot._Gx.lyr[ii].symbol = 0;
                             }
                         }
                     }, thk);
@@ -5960,8 +5920,8 @@
                                 if (index !== undefined) {
                                     plot._Gx.lyr[index].color = finalValue;
                                 } else {
-                                    for (var index = 0; index < Gx.lyr.length; index++) {
-                                        plot._Gx.lyr[index].color = finalValue;
+                                    for (var ii = 0; ii < Gx.lyr.length; ii++) {
+                                        plot._Gx.lyr[ii].color = finalValue;
                                     }
                                 }
                             }, undefined, undefined, undefined, undefined);
@@ -6684,7 +6644,18 @@
         if (o.font_family) {
             Mx.font_family = o.font_family;
         }
-        mx.set_font(Mx, Math.min(7, Mx.width / 64));
+        if (o.font_width) {
+            Mx.font_width = o.font_width;
+        }
+        if (o.font_scaled) {
+            Mx.font_scaled = true;
+        }
+
+        var font_width = Mx.font_width;
+        if (Mx.font_scaled) {
+            font_width = Math.min(Mx.font_width, Mx.width / 64);
+        }
+        mx.set_font(Mx, font_width);
 
         Gx.ncolors = o.ncolors === undefined ? 500 : o.ncolors;
         Gx.cmap = null;
@@ -7021,6 +6992,122 @@
         }
     }
 
+    function draw_pcut_x(plot) {
+        var Mx = plot._Mx;
+        var Gx = plot._Gx;
+
+        if ((Gx.zmin === undefined) || (Gx.zmax === undefined)) {
+            return;
+        }
+
+        //fill variables to draw x-cut box along bottom
+        // one-pixel lines need to be draw on half-pixel boundaries
+        var plot_width = Mx.r - Mx.l;
+        Gx.x_box_x = Math.floor(Mx.l - 2) + 0.5;
+        Gx.x_box_y = Math.floor(Mx.b + 25) + 0.5;
+        Gx.x_box_w = Math.floor(plot_width + 4);
+        Gx.x_box_h = Math.floor((5 * Mx.text_h) + 20);
+
+        mx.draw_box(Mx, Mx.fg, Gx.x_box_x, Gx.x_box_y, Gx.x_box_w, Gx.x_box_h, 1, Mx.bg);
+
+        var ctx = Mx.active_canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = Mx.fg;
+
+        var x = null;
+        var y = null;
+        for (var ii = 0; ii < plot._Gx.x_cut_data.length; ii++) {
+            var z = plot._Gx.x_cut_data[ii]; // the real z-value
+            // constrain to bounds
+            z = Math.min(Math.max(z, Gx.zmin), Gx.zmax);
+            var zrt = plot._Gx.x_box_h / (Gx.zmax - Gx.zmin); // the z-value to pixel ratio
+            var zpx = Math.round(z * zrt);
+
+            var xrt = plot._Gx.x_box_w / plot._Gx.x_cut_data.length;
+            var xpx = Math.round(ii * xrt);
+
+            var xnew = plot._Gx.x_box_x + xpx;
+            var ynew = (plot._Gx.x_box_y + plot._Gx.x_box_h - zpx);
+
+            if (ii === 0) {
+                ctx.moveTo(xnew, ynew);
+            } else if ((xnew !== x) || (ynew !== y)) {
+                // only draw the line if we are moving to a new point
+                ctx.lineTo(xnew, ynew);
+                x = xnew;
+                y = ynew;
+            }
+        }
+        ctx.stroke();
+    }
+
+    function draw_pcut_y(plot) {
+        var Mx = plot._Mx;
+        var Gx = plot._Gx;
+
+        if ((Gx.zmin === undefined) || (Gx.zmax === undefined)) {
+            return;
+        }
+
+        var plot_height = Mx.b - Mx.t;
+
+        //fill variables to draw y-cut box along right sidea
+        // one-pixel lines need to be draw on half-pixel boundaries
+        Gx.y_box_x = Math.floor(Mx.r + 25) + 0.5;
+        Gx.y_box_y = Math.floor(Mx.t - 2) + 0.5;
+        Gx.y_box_w = Math.floor((5 * Mx.text_w) + 20);
+        Gx.y_box_h = Math.floor(plot_height + 2);
+
+        if (Gx.lg_colorbar) { //move over box if large colorbar displayed
+            Gx.y_box_x += 100;
+        }
+
+        //draw y-cut box
+        mx.draw_box(Mx, Mx.fg, Gx.y_box_x, Gx.y_box_y, Gx.y_box_w, Gx.y_box_h, 1, Mx.bg);
+
+        var ctx = Mx.active_canvas.getContext("2d");
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = Mx.fg;
+
+        var x = null;
+        var y = null;
+        for (var ii = 0; ii < plot._Gx.y_cut_data.length; ii++) {
+            var z = plot._Gx.y_cut_data[ii]; // the real z-value
+            // constrain to bounds
+            z = Math.min(Math.max(z, Gx.zmin), Gx.zmax);
+            var zrt = plot._Gx.y_box_w / (Gx.zmax - Gx.zmin); // the z-value to pixel ratio
+            var zpx = Math.round(z * zrt);
+
+            var yrt = plot._Gx.y_box_h / plot._Gx.y_cut_data.length;
+            var ypx = Math.round(ii * yrt);
+
+            var xnew = (plot._Gx.y_box_x + zpx);
+            var ynew = plot._Gx.y_box_y + ypx;
+
+            if (ii === 0) {
+                ctx.moveTo(xnew, ynew);
+            } else if ((xnew !== x) || (ynew !== y)) {
+                // only draw the line if we are moving to a new point
+                ctx.lineTo(xnew, ynew);
+                x = xnew;
+                y = ynew;
+            }
+        }
+        ctx.stroke();
+    }
+
+    function draw_layers(plot) {
+        var layers = plot._Gx.lyr;
+        for (var n = 0; n < layers.length; n++) {
+            //if (Gx.sections !== 0) {
+            // TODO
+            //}
+            draw_layer(plot, layers[n]);
+        }
+    }
+
     /**
      * Draws the specified layer.
      *
@@ -7033,21 +7120,23 @@
      * @private
      * @memberOf sigplot
      */
-    function draw_layer(plot, n) {
+    function draw_layer(plot, layer) {
         var Mx = plot._Mx;
         var Gx = plot._Gx;
 
-        if ((n >= Gx.lyr.length) || (!Gx.lyr[n].display) || (Gx.hold !== 0)) {
+        if ((!layer.display) || (Gx.hold !== 0)) {
             return;
         }
 
-        Gx.lyr[n].draw();
+        layer.draw();
 
+        // TODO consider if this is a source of performance
+        // issues on streaming plots
         var evt = document.createEvent('Event');
         evt.initEvent('lyrdraw', true, true);
-        evt.index = n;
-        evt.name = Gx.lyr[n].name; // the name of the layer
-        evt.layer = Gx.lyr[n];
+        evt.index = layer.index;
+        evt.name = layer.name; // the name of the layer
+        evt.layer = layer;
         mx.dispatchEvent(Mx, evt);
     }
 
@@ -7101,173 +7190,68 @@
             return;
         }
 
-        var eventx = document.createEvent('Event');
-        eventx.initEvent('x-cut', false, false);
-        var onPlotXCut = function() {
-            if (plot._Gx.xcut === undefined) {
-                //create the canvas and plot for xcut
-                plot._Gx.element1 = document.createElement("div");
-                document.getElementById(plot._Gx.parent.id).appendChild(plot._Gx.element1);
-
-                plot._Gx.xcut = new sigplot.Plot(plot._Gx.element1, {});
-                var layer = plot._Gx.xcut.overlay_array(plot._Gx.x_cut_data, null, {
-                    name: "x_cut_data",
-                    line: 3
-                });
-
-                plot._Gx.xcut.change_settings({
-                    specs: !Gx.specs
-                });
-                plot._Gx.xcut.change_settings({
-                    grid: !Gx.grid
-                });
-                plot._Gx.xcut.change_settings({
-                    pan: !Gx.pan
-                });
-                plot._Gx.xcut._Gx.x_box_x = plot._Gx.x_box_x;
-                plot._Gx.xcut._Gx.x_box_y = plot._Gx.x_box_y;
-                plot._Gx.xcut._Gx.x_box_h = plot._Gx.x_box_h;
-                plot._Gx.xcut._Gx.x_box_w = plot._Gx.x_box_w;
-                plot._Gx.xcut.change_settings({
-                    xcut_now: !Gx.xcut_now
-                });
-                plot._Gx.xcut.get_layer(layer).color = plot._Mx.fg;
-                plot._Gx.element1.setAttribute("style", "width:" + plot._Gx.x_box_w + "px;" +
-                    "height:" + plot._Gx.x_box_h + "px;position:absolute;left:" +
-                    plot._Gx.x_box_x + "px;top:" + plot._Gx.x_box_y + "px");
-
-            } else {
-                plot._Gx.xcut.reload(0, plot._Gx.x_cut_data);
-            }
-        };
-        plot.addListener('x-cut', onPlotXCut);
-
-        var eventy = document.createEvent('Event');
-        eventy.initEvent('y-cut', false, false);
-        var onPlotYCut = function() {
-            if (plot._Gx.ycut === undefined) {
-                //create the canvas and plot for ycut
-                plot._Gx.element2 = document.createElement("div");
-                document.getElementById(plot._Gx.parent.id).appendChild(plot._Gx.element2);
-                plot._Gx.ycut = new sigplot.Plot(plot._Gx.element2, {});
-
-                var layer = plot._Gx.ycut.overlay_array(plot._Gx.y_cut_data, null, {
-                    name: "y_cut_data",
-                    line: 3
-                });
-
-                plot._Gx.ycut.change_settings({
-                    specs: !Gx.specs
-                });
-                plot._Gx.ycut.change_settings({
-                    grid: !Gx.grid
-                });
-                plot._Gx.ycut.change_settings({
-                    pan: !Gx.pan
-                });
-                plot._Gx.ycut._Gx.y_box_x = plot._Gx.y_box_x;
-                plot._Gx.ycut._Gx.y_box_y = plot._Gx.y_box_y;
-                plot._Gx.ycut._Gx.y_box_h = plot._Gx.y_box_h;
-                plot._Gx.ycut._Gx.y_box_w = plot._Gx.y_box_w;
-                plot._Gx.ycut.change_settings({
-                    ycut_now: !Gx.ycut_now
-                });
-                plot._Gx.ycut.get_layer(layer).color = plot._Mx.fg;
-                var new_left = plot._Gx.y_box_x + (0.5 * plot._Gx.y_box_w) -
-                    (0.5 * plot._Gx.y_box_h);
-                var new_top = plot._Gx.y_box_y + (0.5 * plot._Gx.y_box_h) -
-                    (0.5 * plot._Gx.y_box_w);
-                plot._Gx.element2.setAttribute("style", "width:" + plot._Gx.y_box_h + "px;" +
-                    "height:" + plot._Gx.y_box_w + "px;position:absolute;left:" +
-                    new_left + "px;top:" + new_top + "px");
-                plot._Gx.element2.style.transform = "rotate(90deg)";
-
-            } else {
-                plot._Gx.ycut.reload(0, plot._Gx.y_cut_data);
-            }
-        };
-        plot.addListener('y-cut', onPlotYCut);
-
         var plot_height = Mx.b - Mx.t;
         var plot_width = Mx.r - Mx.l;
         var height = Gx.lyr[0].yframe;
         var width = Gx.lyr[0].xframe;
 
         if (Gx.p_cuts) {
+            if (!Gx.lyr[0].hcb.pipe) {
+                if (((Mx.xpos >= Mx.l) && (Mx.xpos <= Mx.r) && (Gx.p_cuts_xpos !== Mx.xpos))) {
+                    var line = 0;
+                    var i = 0;
 
-            if (((Mx.xpos >= Mx.l) && (Mx.xpos <= Mx.r) && (Gx.p_cuts_xpos !== Mx.xpos)) ||
-                (Gx.p_press)) {
-                var line = 0;
-                var i = 0;
-                if (Gx.p_cuts_xpos !== undefined) {
-                    //fill data for y_cut for this xpos
+                    //fill data for y_cut for this mouse xpos
                     Gx.y_cut_data = [];
-                    line = Math.floor((width * (Gx.p_cuts_xpos - Mx.l)) / plot_width);
+                    line = Math.floor((width * (Mx.xpos - Mx.l)) / plot_width);
                     for (i = line; i < (width * height); i += width) {
                         Gx.y_cut_data.push(Gx.lyr[0].zbuf[i]);
                     }
-                    mx.dispatchEvent(Mx, eventy);
-
+                    draw_pcut_y(plot);
+                    Gx.p_cuts_xpos = Mx.xpos;
                 }
-                //fill data for y_cut for this mouse xpos
-                Gx.y_cut_data = [];
-                line = Math.floor((width * (Mx.xpos - Mx.l)) / plot_width);
-                for (i = line; i < (width * height); i += width) {
-                    Gx.y_cut_data.push(Gx.lyr[0].zbuf[i]);
-                }
-                mx.dispatchEvent(Mx, eventy);
-                Gx.p_cuts_xpos = Mx.xpos;
+                if (((Mx.ypos >= Mx.t) && (Mx.ypos <= Mx.b) && (Gx.p_cuts_ypos !== Mx.ypos))) {
+                    var row = 0;
+                    var start = 0;
+                    var finish = 0;
+                    var i = 0;
 
-            }
-            if (((Mx.ypos >= Mx.t) && (Mx.ypos <= Mx.b) && (Gx.p_cuts_ypos !== Mx.ypos)) ||
-                (Gx.p_press)) {
-                var row = 0;
-                var start = 0;
-                var finish = 0;
-                var i = 0;
-                if (Gx.p_cuts_ypos !== undefined) {
-                    //fill data for x_cut for this ypos
-                    row = Math.floor((height * (Gx.p_cuts_ypos - Mx.t)) / plot_height);
+                    //fill data for x_cut for this mouse ypos
+                    row = Math.floor((height * (Mx.ypos - Mx.t)) / plot_height);
                     start = row * width;
                     finish = start + width;
                     Gx.x_cut_data = Gx.lyr[0].zbuf.slice(start, finish);
-                    mx.dispatchEvent(Mx, eventx);
+                    draw_pcut_x(plot);
+
+                    Gx.p_cuts_ypos = Mx.ypos;
                 }
-                //fill data for x_cut for this mouse ypos
-                row = Math.floor((height * (Mx.ypos - Mx.t)) / plot_height);
-                start = row * width;
-                finish = start + width;
-                Gx.x_cut_data = Gx.lyr[0].zbuf.slice(start, finish);
-                mx.dispatchEvent(Mx, eventx);
+            } else {
+                if ((Mx.xpos >= Mx.l) && (Mx.xpos <= Mx.r)) {
+                    var line = 0;
+                    var i = 0;
+                    height = Gx.lyr[0].lps;
+                    //fill data for y_cut for this mouse xpos
+                    Gx.y_cut_data = [];
+                    line = Math.floor((width * (Mx.xpos - Mx.l)) / plot_width);
+                    for (i = line; i < (width * height); i += width) {
+                        Gx.y_cut_data.push(Gx.lyr[0].zbuf[i]);
+                    }
+                    draw_pcut_y(plot);
+                }
 
-                Gx.p_cuts_ypos = Mx.ypos;
+                if ((Mx.ypos >= Mx.t) && (Mx.ypos <= Mx.b)) {
+                    var row = 0;
+                    var start = 0;
+                    var finish = 0;
+                    //fill data for x_cut for this mouse ypos
+                    Gx.x_cut_data = [];
+                    row = Math.floor((height * (Mx.ypos - Mx.t)) / plot_height);
+                    start = row * width;
+                    finish = start + width;
+                    Gx.x_cut_data = Gx.lyr[0].zbuf.slice(start, finish);
+                    draw_pcut_x(plot);
+                }
             }
-            Gx.p_press = false;
-        }
-
-        if (Gx.enabled_streaming_pcut) {
-            var line = 0;
-            var i = 0;
-            height = Gx.lyr[0].lps;
-            //fill data for y_cut for this mouse xpos
-            Gx.y_cut_data = [];
-            line = Math.floor((width * (Mx.xpos - Mx.l)) / plot_width);
-            for (i = line; i < (width * height); i += width) {
-                Gx.y_cut_data.push(Gx.lyr[0].zbuf[i]);
-            }
-            mx.dispatchEvent(Mx, eventy);
-
-            var row = 0;
-            var start = 0;
-            var finish = 0;
-            //fill data for x_cut for this mouse ypos
-            Gx.x_cut_data = [];
-            row = Math.floor((height * (Mx.ypos - Mx.t)) / plot_height);
-            start = row * width;
-            finish = start + width;
-            Gx.x_cut_data = Gx.lyr[0].zbuf.slice(start, finish);
-            mx.dispatchEvent(Mx, eventx);
-
         }
     }
 
@@ -7312,11 +7296,11 @@
 
         if (Gx.xmrk !== null && Gx.ymrk !== null) {
             var pix = mx.real_to_pixel(Mx, Gx.xmrk, Gx.ymrk);
-            if (Gx.lyr[0].hcb["class"] === 1) {
+            if ((Gx.lyr.length > 0) && (Gx.lyr[0].hcb["class"] === 1)) {
                 if (pix.clipped) {
                     return;
                 }
-            } else if (Gx.lyr[0].hcb["class"] === 2) {
+            } else if ((Gx.lyr.length > 0) && (Gx.lyr[0].hcb["class"] === 2)) {
                 if (pix.clipped_x || !pix.clipped_y) {
                     return;
                 }
@@ -8123,33 +8107,9 @@
         mx.colorbar(Mx, x, y, w, h);
 
         //draw boxes for the p_cuts
-        if ((Gx.p_cuts || Gx.enabled_streaming_pcut) && (Gx.lyr[0].hcb["class"] === 2)) {
-            var plot_height = Mx.b - Mx.t;
-            var plot_width = Mx.r - Mx.l;
-
-            //fill variables to draw y-cut box along right side
-            Gx.y_box_x = Mx.r + 25;
-            Gx.y_box_y = Mx.t;
-            Gx.y_box_w = (5 * Mx.text_w) + 20;
-            Gx.y_box_h = plot_height;
-
-            if (Gx.lg_colorbar) { //move over box if large colorbar displayed
-                Gx.y_box_x += 100;
-            }
-
-            //draw y-cut box
-            mx.draw_box(Mx, Mx.fg, Gx.y_box_x + 0.5, Gx.y_box_y, Gx.y_box_w, Gx.y_box_h);
-
-            //fill variables to draw x-cut box along bottom
-            Gx.x_box_x = Mx.l;
-            Gx.x_box_y = Mx.b + 25;
-            Gx.x_box_w = plot_width;
-            Gx.x_box_h = (5 * Mx.text_h) + 20;
-
-            mx.draw_box(Mx, Mx.fg, Gx.x_box_x + 0.5, Gx.x_box_y, Gx.x_box_w, Gx.x_box_h);
-
-
-
+        if (Gx.p_cuts && (Gx.lyr.length === 1) && (Gx.lyr[0].hcb["class"] === 2)) {
+            draw_pcut_y(plot);
+            draw_pcut_x(plot);
         }
 
     }
